@@ -29,8 +29,8 @@ def main():
 	
 	root = tk.Tk()
 	root.title('Monitoramento de Rotas de Van')
-	root.geometry('1960x1080')
-	f = tk.Frame(root, height=400, bg="#1E6B2F")
+	root.geometry('800x500')
+	f = tk.Frame(root, height=350, bg="#1E6B2F")
 	cabeçalho(root)
 	f.pack(fill=tk.X)
 
