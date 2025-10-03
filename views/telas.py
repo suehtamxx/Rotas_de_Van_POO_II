@@ -8,17 +8,17 @@ class VanJaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Monitoramento de Rotas de Van")
-        self.root.geometry("800x500")
+        self.root.geometry("800x600")
         self.usuario_logado = None
 
         self.cabecalho()
 
         # titulo do frame verder
-        self.f = tk.Frame(self.root, bg="#103F35")
-        self.f.pack(fill=tk.X, ipady=100)
+        self.f = tk.Frame(self.root, bg="#103f35")
+        self.f.pack(fill=tk.X, ipady=30)
         self.title_frame = tk.Label(
             self.f,
-            text="Van Já: Sua Rota Diária e Segura\n Para Picos-PI",
+            text="Van Já: sua rota diária e segura\n em Picos-PI e Região",
             bg="#103f35",
             fg="white",
             font=("Arial", 22, "bold"),
@@ -28,7 +28,7 @@ class VanJaApp:
         # frase abaixo do titulo
         self.merchan_lbl = tk.Label(
             self.f,
-            text="Planos mensais ou passagens diárias. Encontre sua rota universitária.",
+            text="Passagens diárias! Encontre a rota necessária para você!.",
             bg="#103f35",
             fg="white",
         )
@@ -75,25 +75,35 @@ class VanJaApp:
         # Lista de rotas (pode ser expandida depois)
         # self.routes_listbox = tk.Listbox(self.root, width=50, height=10)
         # self.routes_listbox.pack(pady=10)
-
-        # Botão para ver detalhes (exemplo de callback OO)
-        self.details_button = tk.Button(
-            self.root, text="Ver Detalhes", command=self.ver_detalhes
-        )
-        self.details_button.pack(pady=10)
+        self.criar_cards_rotas()
 
     def buscar_rota(self):
+        from controllers.controler import encontrar_rota_por_origem_destino
+
         origem = self.origem_ent.get()
         destino = self.destino_ent.get()
 
-        if origem and destino:
+        if not origem or not destino:
+            messagebox.showerror(
+                "Erro", "Por favor, preencha os campos de origem e destino."
+            )
+            return
+
+        rota_encontrada = encontrar_rota_por_origem_destino(origem, destino)
+
+        if rota_encontrada:
+            info_texto = (
+                f"Rota Encontrada de {rota_encontrada.origem} para {rota_encontrada.destino}!\n\n"
+                f"Motorista: {rota_encontrada.motorista}\n"
+                f"Preço: {rota_encontrada.preco}\n"
+                f"Ponto de Embarque: {rota_encontrada.ponto_embarque}\n"
+                f"Ponto de Desembarque: {rota_encontrada.ponto_desembarque}"
+            )
+            messagebox.showinfo("Rota Encontrada", info_texto)
+        else:
             messagebox.showinfo(
                 "Busca de Rotas",
                 f"Ainda não há rotas disponíveis entre {origem} e {destino}.",
-            )
-        else:
-            messagebox.showerror(
-                "Erro", "Por favor, preencha os campos de origem e destino."
             )
 
     def cabecalho(self):
@@ -151,9 +161,6 @@ class VanJaApp:
         )
 
         self.header.grid_columnconfigure(1, weight=1)
-
-    def ver_detalhes(self):
-        pass
 
     def tela_login(self):
         self.login = tk.Toplevel()
@@ -314,7 +321,7 @@ class VanJaApp:
             "Bem-vindo à Central de Ajuda do Van Já!\n\n"
             "• Para buscar uma rota, utilize os campos 'Origem' e\n 'Destino' na tela principal.\n\n"
             "• Para fazer login ou se cadastrar, clique no botão 'Login'\n no canto superior direito.\n\n"
-            "Para suporte adicional, entre em contato:\n"
+            "• Em Rotas em Destaque, clique em Ver Rota para mais detalhes sobre aquela rota"
         )
 
         ajuda_lbl = tk.Label(
@@ -326,10 +333,95 @@ class VanJaApp:
         )
         ajuda_lbl.pack(pady=5, padx=20)
 
+    def criar_cards_rotas(self):
+        # Importando a classe Rota
+        from models.rotas import Rota
+
+        container_principal = tk.Frame(self.root, bg="#F0F8F5")
+        container_principal.pack(fill="both", expand=True, padx=20, pady=10)
+
+        titulo_secao = tk.Label(
+            container_principal,
+            text="Rotas em Destaque",
+            font=("Arial", 18, "bold"),
+            bg="#F0F8F5",
+            fg="#103F35",
+        )
+        titulo_secao.pack(anchor="w", padx=15, pady=(5, 15))
+
+        cards_frame = tk.Frame(container_principal, bg="#F0F8F5")
+        cards_frame.pack(fill="x")
+
+        for rota in Rota.lista_de_rotas:
+            card = tk.Frame(cards_frame, bg="white", relief="solid", borderwidth=1)
+            card.pack(side="left", fill="y", padx=15, pady=5, expand=True)
+
+            origem_destino = f"{rota.origem} → {rota.destino}"
+            rota_lbl = tk.Label(
+                card, text=origem_destino, font=("Arial", 14, "bold"), bg="white"
+            )
+            rota_lbl.pack(anchor="w", padx=10, pady=(10, 5))
+
+            tags_frame = tk.Frame(card, bg="white")
+            tags_frame.pack(anchor="w", padx=10)
+
+            bottom_frame = tk.Frame(card, bg="white")
+            bottom_frame.pack(fill="x", side="bottom", padx=10, pady=10)
+
+            preco_lbl = tk.Label(
+                bottom_frame, text=rota.preco, font=("Arial", 12, "bold"), bg="white"
+            )
+            preco_lbl.pack(side="left")
+
+            ver_rota_btn = tk.Button(
+                bottom_frame,
+                text="Ver rota",
+                bg="#3A7C63",
+                fg="white",
+                command=lambda r=rota: self.mostrar_detalhes_rota(r),
+            )
+            ver_rota_btn.pack(side="right")
+
+    def mostrar_detalhes_rota(self, rota):
+        detalhes_window = tk.Toplevel(self.root)
+        detalhes_window.title(f"Detalhes da Rota: {rota.origem} → {rota.destino}")
+        detalhes_window.geometry("400x300")
+        detalhes_window.configure(bg="#F0F8F5")
+
+        # Frame para organizar o conteúdo
+        frame = tk.Frame(detalhes_window, bg="#F0F8F5")
+        frame.pack(pady=20, padx=20, fill="both", expand=True)
+
+        tk.Label(
+            frame, text=f"Motorista:", font=("Arial", 11, "bold"), bg="#F0F8F5"
+        ).grid(row=0, column=0, sticky="w")
+        tk.Label(frame, text=rota.motorista, font=("Arial", 11), bg="#F0F8F5").grid(
+            row=0, column=1, sticky="w", padx=5
+        )
+
+        tk.Label(frame, text=f"Preço:", font=("Arial", 11, "bold"), bg="#F0F8F5").grid(
+            row=1, column=0, sticky="w", pady=(10, 0)
+        )
+        tk.Label(frame, text=rota.preco, font=("Arial", 11), bg="#F0F8F5").grid(
+            row=1, column=1, sticky="w", padx=5, pady=(10, 0)
+        )
+
+        tk.Label(
+            frame, text=f"Embarque:", font=("Arial", 11, "bold"), bg="#F0F8F5"
+        ).grid(row=2, column=0, sticky="w", pady=(10, 0))
+        tk.Label(
+            frame, text=rota.ponto_embarque, font=("Arial", 11), bg="#F0F8F5"
+        ).grid(row=2, column=1, sticky="w", padx=5, pady=(10, 0))
+
+        tk.Label(
+            frame, text=f"Desembarque:", font=("Arial", 11, "bold"), bg="#F0F8F5"
+        ).grid(row=3, column=0, sticky="w", pady=(10, 0))
+        tk.Label(
+            frame, text=rota.ponto_desembarque, font=("Arial", 11), bg="#F0F8F5"
+        ).grid(row=3, column=1, sticky="w", padx=5, pady=(10, 0))
+
 
 if __name__ == "__main__":
-    Rota("Rota 1", ["Parada A", "Parada B"], "08:00 - 18:00")
-    Rota("Rota 2", ["Parada C", "Parada D"], "09:00 - 19:00")
     root = tk.Tk()
     app = VanJaApp(root)
     root.mainloop()

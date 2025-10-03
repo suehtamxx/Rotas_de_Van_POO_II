@@ -16,3 +16,17 @@ def validar_login(email, senha):
         if usuario["email"] == email and usuario["senha"] == senha:
             return usuario
     return None
+
+
+from models.rotas import Rota
+
+
+def encontrar_rota_por_origem_destino(origem, destino):
+
+    for rota in Rota.lista_de_rotas:
+        if (
+            rota.origem.lower() == origem.lower()
+            and rota.destino.lower() == destino.lower()
+        ):
+            return rota
+    return None
