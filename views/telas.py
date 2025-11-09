@@ -1,5 +1,4 @@
 import tkinter as tk
-from models.rotas import Rota
 from tkinter import messagebox
 from PIL import Image, ImageTk
 
