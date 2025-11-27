@@ -48,7 +48,7 @@ class TelaAdicionarRotaFrame(tk.Frame):
             "Ponto de Desembarque:",
         ]
 
-        self.entries = {}  # Dicionário para guardar os campos Entry
+        self.entries = {}  #para os campos entry
 
         for i, label_text in enumerate(labels):
             lbl = tk.Label(form_frame, text=label_text, bg="#103f35", fg="white")

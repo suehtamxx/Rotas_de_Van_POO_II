@@ -17,14 +17,13 @@ def salvar_usuarios_em_arquivo(lista_de_usuarios):
     except Exception as e:
         print(f">>> (Thread): Erro ao salvar usuários: {e}")
 
-
 def carregar_usuarios_do_arquivo():
     """Tenta carregar os usuários do arquivo JSON no início."""
     global usuarios
     try:
         with open(ARQUIVO_USUARIOS, "r", encoding="utf-8") as f:
             usuarios_carregados = json.load(f)
-
+            
         usuarios = []
         for u in usuarios_carregados:
             if "tipo_usuario" not in u:

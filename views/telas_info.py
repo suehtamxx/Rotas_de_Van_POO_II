@@ -188,11 +188,16 @@ class TelaPrincipalFrame(tk.Frame):
 
             bottom_frame = tk.Frame(card, bg="white")
             bottom_frame.pack(fill="x", side="bottom", padx=10, pady=10)
-
+			
             preco_lbl = tk.Label(
                 bottom_frame, text=rota.preco, font=("Arial", 12, "bold"), bg="white"
             )
             preco_lbl.pack(side="left")
+		    
+            horario_lbl = tk.Label(
+				bottom_frame, text=rota.horario, font=("Arial", 12, "bold"), bg="white"
+			)
+            horario_lbl.pack(side="right")
 
             ver_rota_btn = tk.Button(
                 bottom_frame,
