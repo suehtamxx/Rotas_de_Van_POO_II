@@ -1,5 +1,5 @@
 import psycopg2
-from config import load_config
+from controllers.config import load_config
 
 def create_tables():
 	commands = (
@@ -21,7 +21,7 @@ def create_tables():
 			    id SERIAL PRIMARY KEY,
 				nome VARCHAR(40) NOT NULL,
 				email VARCHAR(40) NOT NULL,
-				senha VARCHAR(50) NOT NULL,
+				senha VARCHAR(255) NOT NULL,
 				telefone VARCHAR(15) NOT NULL,
 				tipo_usuario VARCHAR(15)
 		)"""
