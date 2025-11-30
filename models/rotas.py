@@ -1,4 +1,9 @@
 class Rota:
+    """
+    Modelo de dados que representa uma viagem/rota no sistema.
+    Armazena atributos como origem, destino, paradas e dias, além de manter uma lista estática das rotas carregadas na memória.
+    """
+
     lista_de_rotas = []
 
     def __init__(
@@ -11,7 +16,11 @@ class Rota:
         motorista,
         ponto_embarque,
         ponto_desembarque,
+        paradas="",
+        dias_disponiveis="",
+        id=None,
     ):
+        self.id = id
         self.origem = origem
         self.destino = destino
         self.horario = horario
@@ -20,13 +29,13 @@ class Rota:
         self.motorista = motorista
         self.ponto_embarque = ponto_embarque
         self.ponto_desembarque = ponto_desembarque
+        self.paradas = paradas
+        self.dias_disponiveis = dias_disponiveis
+        Rota.lista_de_rotas.append(self)
 
-    def __str__(self):
-        return f"Rota de {self.origem} para {self.destino} com {self.motorista}"
-
-    # converter o objeto em um dicionário (para salvar em JSON)
     def to_dict(self):
         return {
+            "id": self.id,
             "origem": self.origem,
             "destino": self.destino,
             "horario": self.horario,
@@ -35,4 +44,9 @@ class Rota:
             "motorista": self.motorista,
             "ponto_embarque": self.ponto_embarque,
             "ponto_desembarque": self.ponto_desembarque,
+            "paradas": self.paradas,
+            "dias_disponiveis": self.dias_disponiveis,
         }
+
+    def __str__(self):
+        return f"Rota de {self.origem} para {self.destino} ({self.dias_disponiveis})"

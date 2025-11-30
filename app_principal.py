@@ -2,10 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 from models.rotas import Rota
 
-# Importa os FRAMES (páginas)
-from .telas_usuario import TelaLoginFrame, TelaCadastroFrame
-from .telas_info import TelaPrincipalFrame, TelaAjuda, TelaDetalhes
-from .telas_motorista import TelaAdicionarRotaFrame
+from views.telas_usuario import TelaLoginFrame, TelaCadastroFrame
+from views.telas_info import TelaPrincipalFrame, TelaAjuda, TelaDetalhes
+from views.telas_motorista import TelaAdicionarRotaFrame
 from controllers.controler import validar_login
 
 """classe 'VanJaApp': controlador central da interface.
@@ -33,6 +32,7 @@ class VanJaApp:
             TelaCadastroFrame,
             TelaAdicionarRotaFrame,
         ):
+            # Passamos 'self' (o app principal) como controlador
             frame = F(container, self)
             self.frames[F.__name__] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -45,8 +45,15 @@ class VanJaApp:
         """Traz um frame para a frente (muda de 'página')."""
         frame = self.frames[nome_da_classe_str]
         frame.tkraise()
+        
+        # Se voltar para a tela principal, recarrega os cards (opcional)
+        if nome_da_classe_str == "TelaPrincipalFrame":
+             # Verifica se o método existe antes de chamar
+             if hasattr(frame, 'recarregar_cards'):
+                 frame.recarregar_cards()
 
     def tentar_login(self, email, senha):
+        # retorna o objeto usuario
         usuario = validar_login(email, senha)
         if usuario:
             self.usuario_logado = usuario
@@ -55,6 +62,11 @@ class VanJaApp:
             messagebox.showinfo("Login", "Login Realizado com Sucesso.")
         else:
             messagebox.showerror("Erro", "Email ou senha incorretos.")
+
+    def cadastrar_usuario_controller(self, nome, email, senha, telefone, tipo_usuario):
+        # metodo auxiliar para conectar a tela de cadastro ao controlador
+        from controllers.controler import cadastrar_usuario
+        return cadastrar_usuario(nome, email, senha, telefone, tipo_usuario)
 
     def fazer_logout(self):
         self.usuario_logado = None
